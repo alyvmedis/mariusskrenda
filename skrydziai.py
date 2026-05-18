@@ -135,46 +135,25 @@ def search_standard_flights(api, tomorrow, search_end):
             print(f"Klaida standartinėje paieškoje iš {origin}: {e}")
 
 if __name__ == "__main__":
-    import os
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import threading
+  import os
+from datetime import datetime, timedelta
+import time
 
-# 1. Sukuriame mini svetainės funkciją fone
-class SimpleServer(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(b"Robotas veikia gyvai debesyje!")
-
-def run_web_server():
-    port = int(os.environ.get("PORT", 10000))
-    server = HTTPServer(("0.0.0.0", port), SimpleServer)
-    print(f"🌍 Mini svetaine paleista ant prievado {port}")
-    server.serve_forever()
-
-# 2. Pagrindinis tavo skrydžių ciklas
 def flight_hunter_loop():
     print("🚀 Skrydžių robotas sėkmingai paleistas debesyje!")
-    while True:
-        try:
-            api_instance = Ryanair(CURRENCY)
-            tomorrow_dt = datetime.now() + timedelta(days=1)
-            search_end_dt = datetime.now() + timedelta(days=180)
+    try:
+        api_instance = Ryanair(CURRENCY)
+        tomorrow_dt = datetime.now() + timedelta(days=1)
+        search_end_dt = datetime.now() + timedelta(days=180)
 
-            print(f"--- Skenuoju Ryanair ({datetime.now().strftime('%H:%M:%S')}) ---")
+        print(f"--- Skenuoju Ryanair ({datetime.now().strftime('%H:%M:%S')}) ---")
 
-            search_italy_triangle(api_instance, tomorrow_dt, search_end_dt)
-            search_standard_flights(api_instance, tomorrow_dt, search_end_dt)
+        search_italy_triangle(api_instance, tomorrow_dt, search_end_dt)
+        search_standard_flights(api_instance, tomorrow_dt, search_end_dt)
 
-            print("\nPaieška baigta!")
-        except Exception as e:
-            print(f"⚠️ Klaida skenavimo metu: {e}")
-            
-        print("⏳ Užmiegu 12-kai valandų iki kito skenavimo...")
-        time.sleep(43200)
+        print("\nPaieška sėkmingai baigta!")
+    except Exception as e:
+        print(f"⚠️ Klaida skenavimo metu: {e}")
 
 if __name__ == "__main__":
-    # Paleidžiame svetainę vienoje gijoje, o skrydžių ieškiklį – kitoje
-    threading.Thread(target=run_web_server, daemon=True).start()
     flight_hunter_loop()
